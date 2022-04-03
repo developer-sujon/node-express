@@ -1,6 +1,6 @@
-const { Schema, model } = require("mongoose");
+const mongoose = require("mongoose");
 
-const userSchema = new Schema(
+const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -27,12 +27,18 @@ const userSchema = new Schema(
       type: Date,
       default: new Date(),
     },
+    contacts: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Contact",
+      },
+    ],
   },
   {
     timestamps: true,
   },
 );
 
-const User = new model("User", userSchema);
+const User = new mongoose.model("User", userSchema);
 
 module.exports = User;

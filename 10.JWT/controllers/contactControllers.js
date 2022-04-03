@@ -1,9 +1,10 @@
 const Contact = require("../models/Contact.js");
+const User = require("../models/User.js");
 
 //get all contacts
 exports.getAllContacat = async (req, res, next) => {
   try {
-    const contacts = await Contact.find();
+    const contacts = await Contact.find().populate("user", "name username -_id");
     if (contacts && contacts.length > 0) {
       res.json({ result: contacts });
     } else {
@@ -18,7 +19,7 @@ exports.getAllContacat = async (req, res, next) => {
 //get a contact by id
 exports.getSingleContacat = async (req, res, next) => {
   try {
-    const contact = await Contact.find({ _id: req.params.id });
+    const contact = await Contact.find({ _id: req.params.id }).populate("user");
     if (contact && contact.length > 0) {
       res.json({ result: contact });
     } else {
@@ -33,8 +34,23 @@ exports.getSingleContacat = async (req, res, next) => {
 //create a contact
 exports.createContact = async (req, res, next) => {
   try {
-    const contact = Contact(req.body);
-    await contact.save();
+    const user = await User.find({ _id: req.userId });
+    const newContact = await Contact({
+      ...req.body,
+      user: user[0]._id,
+    });
+    const contact = await newContact.save();
+
+    await User.updateOne(
+      {
+        _id: req.userId,
+      },
+      {
+        $push: {
+          contacts: contact._id,
+        },
+      },
+    );
     res.json({ message: "Contact created successfully", result: contact });
   } catch (error) {
     console.log(error);

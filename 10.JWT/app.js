@@ -10,7 +10,7 @@ const userRoutes = require("./routes/usersRoutes");
 //initialize application
 const app = express();
 const PORT = 5000;
-const URL = "mongodb://0.0.0.0:27017/connects";
+const URL = "mongodb://0.0.0.0:27017/contacts";
 const options = {};
 
 //middleware array

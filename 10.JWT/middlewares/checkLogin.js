@@ -8,6 +8,9 @@ const checkLogin = async (req, res, next) => {
     const { username, userId } = decoded;
     req.username = username;
     req.userId = userId;
+
+    console.log(decoded);
+
     next();
   } catch (error) {
     //next("Unauthorized Credential");

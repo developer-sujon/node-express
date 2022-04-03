@@ -1,10 +1,11 @@
 const User = require("../models/User");
+const Contact = require("../models/Contact");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 exports.getUsers = async (req, res, next) => {
   try {
-    const users = await User.find();
+    const users = await User.find().populate("contacts", "name phone status -_id");
     if (users && users.length > 0) {
       res.json({ result: users });
     } else {
@@ -35,7 +36,7 @@ exports.createUser = async (req, res, next) => {
   }
 };
 
-//logn user
+//login user
 exports.loginUser = async (req, res, next) => {
   try {
     const user = await User.find({ username: req.body.username });
@@ -48,7 +49,7 @@ exports.loginUser = async (req, res, next) => {
       if (isValidPassword) {
         //generate jsonwebtoken token
         const token = jwt.sign(
-          { name: user[0].name, username: user[0].username },
+          { name: user[0].name, userId: user[0]._id },
           process.env.JWT_SECRET,
           {
             expiresIn: "1h",
@@ -58,7 +59,7 @@ exports.loginUser = async (req, res, next) => {
           },
         );
 
-        res.json({ messages: "Login Successfull", token: token});
+        res.json({ messages: "Login Successfull", token: token });
       } else {
         res.status(401).json({ error: "Unauthorized Credential" });
       }
